@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Catalogue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .book-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background-color: #fafafa;
+            transition: transform 0.2s;
+        }
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .book-id {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .book-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .book-author {
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        .book-price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Catalogue</h1>
+        <div id="bookList">
+            <div class="loading">Loading books...</div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and parse XML data
+        async function loadBooks() {
+            try {
+                const response = await fetch('book.xml');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const xmlText = await response.text();
+                
+                // Parse XML string
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Check for XML parsing errors
+                const parseError = xmlDoc.getElementsByTagName('parsererror')[0];
+                if (parseError) {
+                    throw new Error('XML parsing error: ' + parseError.textContent);
+                }
+                
+                // Get all book elements
+                const books = xmlDoc.getElementsByTagName('book');
+                const bookList = document.getElementById('bookList');
+                
+                // Clear loading message
+                bookList.innerHTML = '';
+                
+                // Display each book
+                for (let book of books) {
+                    const id = book.getAttribute('id');
+                    const title = book.getElementsByTagName('title')[0].textContent;
+                    const author = book.getElementsByTagName('author')[0].textContent;
+                    const price = book.getElementsByTagName('price')[0].textContent;
+                    
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'book-card';
+                    bookCard.innerHTML = `
+                        <div class="book-id">ID: ${id}</div>
+                        <div class="book-title">${title}</div>
+                        <div class="book-author">by ${author}</div>
+                        <div class="book-price">$${price}</div>
+                    `;
+                    
+                    bookList.appendChild(bookCard);
+                }
+                
+            } catch (error) {
+                console.error('Error loading books:', error);
+                document.getElementById('bookList').innerHTML = `
+                    <div class="error">
+                        Error loading book data: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Load books when page loads
+        document.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+</body>
+</html>
