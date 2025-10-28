@@ -13,42 +13,47 @@
         }
         h1 {
             text-align: center;
-            color: #333;
         }
         .book {
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             padding: 15px;
             margin: 10px 0;
-            background-color: #f9f9f9;
+        }
+        .book:hover {
+            background-color: #f0f0f0;
         }
         .title {
             font-weight: bold;
-            font-size: 18px;
         }
         .author {
             color: #555;
-            margin: 5px 0;
         }
         .price {
             color: #008000;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>Book Catalogue</h1>
-    <div id="books"></div>
+    <div id="books">Loading books...</div>
 
     <script>
+        // 加载XML数据
         fetch('book.xml')
             .then(response => response.text())
             .then(xmlText => {
+                // 解析XML
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
                 
+                // 获取所有书籍
                 const books = xmlDoc.getElementsByTagName('book');
                 const booksContainer = document.getElementById('books');
                 
+                // 清空加载提示
+                booksContainer.innerHTML = '';
+                
+                // 显示每本书
                 for (let i = 0; i < books.length; i++) {
                     const book = books[i];
                     const title = book.getElementsByTagName('title')[0].textContent;
@@ -59,8 +64,8 @@
                     bookElement.className = 'book';
                     bookElement.innerHTML = `
                         <div class="title">${title}</div>
-                        <div class="author">Author: ${author}</div>
-                        <div class="price">Price: $${price}</div>
+                        <div class="author">${author}</div>
+                        <div class="price">$${price}</div>
                     `;
                     
                     booksContainer.appendChild(bookElement);
