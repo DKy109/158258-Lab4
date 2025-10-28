@@ -38,22 +38,14 @@
     <div id="books">Loading books...</div>
 
     <script>
-        // 加载XML数据
         fetch('book.xml')
             .then(response => response.text())
             .then(xmlText => {
-                // 解析XML
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                
-                // 获取所有书籍
                 const books = xmlDoc.getElementsByTagName('book');
                 const booksContainer = document.getElementById('books');
-                
-                // 清空加载提示
                 booksContainer.innerHTML = '';
-                
-                // 显示每本书
                 for (let i = 0; i < books.length; i++) {
                     const book = books[i];
                     const title = book.getElementsByTagName('title')[0].textContent;
@@ -77,4 +69,5 @@
             });
     </script>
 </body>
+
 </html>
